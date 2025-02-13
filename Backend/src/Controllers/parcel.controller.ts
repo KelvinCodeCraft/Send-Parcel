@@ -1,13 +1,9 @@
 import { Request, RequestHandler, Response } from "express";
-import { v4 as uid } from "uuid";
 import db from '../Databasehelper/db-connection';
-import mssql from "mssql";
-import { Data } from "../Interfaces/parcelInterfaces";
-import { ParcelSchema, SenderSchema } from "../helpers/parcel.validate";
-import { stat } from "fs";
-// interface Extended extends Request {
-//   info?: Data;
-// }
+import { ParcelSchema } from "../helpers/parcel.validate";
+import ejs from 'ejs';
+import sendMail from "../../background/Helpers/email.helpers";
+import path from 'path';
 
 interface ExtendedRequest extends Request {
   body: {
@@ -207,8 +203,6 @@ export const updateParcel: RequestHandler<{ id: string }> = async (req, res): Pr
 
     // Check if the parcel exists by executing the stored procedure "getParcelById"
     const result = await db.exec("getParcelById", { id });
-    // Adjust this check depending on your db.exec response. For example, if using mssql:
-    // result.recordset is usually an array of rows.
     if (result && result.length > 0) {
       // Parcel exists; perform the update.
       await db.exec("ProjectCreateOrUpdate", {
@@ -227,16 +221,62 @@ export const updateParcel: RequestHandler<{ id: string }> = async (req, res): Pr
         senderLng,
         deliveryStatus,
       });
+
+      // Check deliveryStatus data from req.body
+      if (deliveryStatus === 'delivered') {
+        // Send email to receiver and sender
+        const templatePath = path.join(__dirname, '../../../templates', 'deliveryNotification.ejs');
+        const emailData = { senderName, receiverName, deliveryDate };
+
+        console.log("Rendering EJS template with data:", emailData);
+
+        ejs.renderFile(templatePath, emailData, async (error, html) => {
+          if (error) {
+            console.error("Error rendering EJS template:", error);
+            return res.status(500).json({ message: "Error rendering email template" });
+          }
+
+          console.log("Rendered HTML:", html);
+
+          const messageToSender = {
+            from: process.env.EMAIL,
+            to: senderEmail,
+            subject: "Parcel Delivered",
+            html
+          };
+
+          const messageToReceiver = {
+            from: process.env.EMAIL,
+            to: receiverEmail,
+            subject: "Parcel Delivered",
+            html
+          };
+
+          try {
+            console.log("Sending email to sender:", senderEmail);
+            await sendMail(messageToSender);
+            console.log("Email sent to sender:", senderEmail);
+
+            console.log("Sending email to receiver:", receiverEmail);
+            await sendMail(messageToReceiver);
+            console.log("Email sent to receiver:", receiverEmail);
+          } catch (emailError) {
+            console.error("Error sending email:", emailError);
+            return res.status(500).json({ message: "Error sending email" });
+          }
+        });
+      }
+
       return res.status(200).json({ message: "Parcel Updated ..." });
     } else {
       // If parcel doesn't exist, send a 404 error.
       return res.status(404).json({ message: "Parcel Not Found" });
     }
   } catch (error) {
+    console.error("Error updating parcel:", error);
     return res.status(500).json({ error });
   }
 };
-
 
 export const deliverParcel: RequestHandler<{ id: string }> = async (
   req,
