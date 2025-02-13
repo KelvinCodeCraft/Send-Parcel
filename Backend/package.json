@@ -1,0 +1,41 @@
+{
+	"name": "send-it",
+	"version": "1.0.0",
+	"description": "Send It ",
+	"main": "index.js",
+	"scripts": {
+		"build": "tsc --w"
+	},
+	"author": "Kelvin Kipchumba",
+	"license": "ISC",
+	"dependencies": {
+		"@types/ejs": "^3.1.5",
+		"@types/joi": "^17.2.3",
+		"@types/lodash": "^4.17.15",
+		"bcrypt": "^5.1.1",
+		"cors": "^2.8.5",
+		"dotenv": "^16.4.7",
+		"ejs": "^3.1.10",
+		"express": "^4.21.2",
+		"joi": "^17.13.3",
+		"jsonwebtoken": "^9.0.2",
+		"mssql": "^11.0.1",
+		"node-cron": "^3.0.3",
+		"nodemailer": "^6.10.0",
+		"uuid": "^11.0.5"
+	},
+	"devDependencies": {
+		"@types/bcrypt": "^5.0.2",
+		"@types/cors": "^2.8.17",
+		"@types/dotenv": "^8.2.3",
+		"@types/express": "^5.0.0",
+		"@types/jsonwebtoken": "^9.0.8",
+		"@types/mssql": "^9.1.7",
+		"@types/multer": "^1.4.12",
+		"@types/node-cron": "^3.0.11",
+		"@types/nodemailer": "^6.4.17",
+		"@types/uuid": "^10.0.0",
+		"ts-node": "^10.9.2",
+		"typescript": "^5.7.3"
+	}
+}
