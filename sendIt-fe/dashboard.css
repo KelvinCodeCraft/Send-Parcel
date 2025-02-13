@@ -1,0 +1,195 @@
+:root {
+    --primary: #008B8B;
+    --secondary: #004242;
+    --white: #ffffff;
+}
+
+body {
+    margin: 0;
+}
+
+.navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: var(--secondary);
+    color: var(--white);
+    height: 64px;
+}
+
+.profile,
+.links {
+    margin: 0 20px;
+}
+
+.links a {
+    color: var(--white);
+    text-decoration: none;
+    padding: 10px;
+}
+
+.links button,
+td button {
+    border: 1px solid var(--white);
+    background-color: var(--secondary);
+    color: var(--white);
+    width: 70px;
+    border-radius: 30px;
+    padding: 6px;
+}
+
+#edit-btn {
+    border: 1px solid var(--primary);
+    background-color: var(--white);
+    color: var(--secondary);
+}
+
+.profile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.sub-menu {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.searchbar {
+    margin: 2%;
+}
+
+.searchbar input {
+    padding: 10px;
+    border: 1px solid var(--primary);
+    color: var(--secondary);
+    border-radius: 4px;
+}
+
+.add-btn {
+    margin-right: 2%;
+    display: block;
+}
+
+#edit-btn{
+    display: block;
+}
+
+.add-btn button {
+    padding: 8px;
+    background-color: var(--white);
+    border: 1px solid var(--primary);
+    color: var(--secondary);
+    font-size: large;
+    border-radius: 8px;
+}
+
+table {
+    font-family: arial, sans-serif;
+    border-collapse: collapse;
+    width: 96%;
+    margin: auto;
+}
+
+td,
+th {
+    border: 1px solid var(--primary);
+    text-align: left;
+    padding: 8px;
+}
+
+tr:nth-child(even) {
+    background-color: #dddddd;
+}
+
+.action-btns{
+    display: flex;
+    justify-content: space-evenly;
+}
+.formSuccess{
+    color: green;
+    text-align: center;
+    font-size: larger;
+    font-weight: bold;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+    transition: 0.3s;
+    width: 20%;
+    margin: 20px auto;
+    padding: 20px;
+    display: none;
+}
+.parcel-form {
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+    transition: 0.3s;
+    width: 50%;
+    margin: 20px auto;
+}
+
+@media screen and (max-width: 420px) {
+    .parcel-form {
+        width: 100%;
+    }
+}
+
+form {
+    padding: 20px 48px;
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Two columns */
+    column-gap: 32px; /* Space between grid items */
+    row-gap: 32px;
+    align-items: start;
+}
+
+form h1, p {
+    grid-column: span 2; /* Heading spans both columns */
+    text-align: center;
+    color: var(--secondary);
+}
+#form-error{
+    color: red;
+    font-size: medium;
+    display: none;
+}
+
+label {
+    margin: 5px 0;
+}
+
+input, textarea, select {
+    padding: 8px;
+    border: 1px solid var(--primary);
+    border-radius: 4px;
+    width: 100%;
+}
+
+textarea {
+    height: 80px;
+}
+
+.form-buttons {
+    grid-column: span 2; /* Buttons span both columns */
+    display: flex;
+    justify-content: space-around;
+}
+form button{
+    margin: 20px 0;
+    padding: 8px;
+    background-color: var(--secondary);
+    color: var(--white);
+    border: none;
+    border-radius: 4px;
+    font-size: large;
+}
+.close-btn{
+    background-color: red;
+}
+.parcel-form{
+    display: none;
+}
+
+#map{
+    height: 400px; 
+    width: 70%;
+    margin: auto;
+}
