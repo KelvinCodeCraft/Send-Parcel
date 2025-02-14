@@ -21,6 +21,13 @@ interface ExtendedRequest extends Request {
     senderLng: string;
     deliveryStatus: string;
   };
+  query: {
+    senderEmail?: string;
+    receiverEmail?: string;
+    email?: string;
+    role?: string;
+    status?: string; // Add status query parameter
+  };
 }
 
 export const addParcel = async (req: ExtendedRequest, res: Response): Promise<any> => {
@@ -87,22 +94,26 @@ export const getParcels: RequestHandler = async (
   req: ExtendedRequest,
   res: Response): Promise<any> => {
   try {
-    const { senderEmail, receiverEmail } = req.query;
+    const { senderEmail, receiverEmail, status } = req.query;
     let result;
- 
-    if ((senderEmail && typeof senderEmail === "string") || (receiverEmail && typeof receiverEmail === "string")) {
-      const email = senderEmail ? senderEmail : receiverEmail;
-      const cleanEmail = typeof email === "string" ? email.replace(/['"]/g, "") : "";
-      
-      result = await db.exec("getParcelsByEmail", { email: cleanEmail });
+
+    if (status && typeof status === "string") {
+      const cleanStatus = status.replace(/['"]/g, "");
+      result = await db.exec("getParcelsByStatus", { status: cleanStatus });
+    } else if (senderEmail && typeof senderEmail === "string") {
+      const cleanSenderEmail = senderEmail.replace(/['"]/g, "");
+      result = await db.exec("getParcelsByEmail", { email: cleanSenderEmail, role: 'sender' });
+    } else if (receiverEmail && typeof receiverEmail === "string") {
+      const cleanReceiverEmail = receiverEmail.replace(/['"]/g, "");
+      result = await db.exec("getParcelsByEmail", { email: cleanReceiverEmail, role: 'receiver' });
     } else {
       result = await db.exec("getAllParcels");
     }
- 
+
     if (!result || result.length === 0) {
       return res.status(404).json({ message: "No parcels found" });
     }
- 
+
     res.status(200).json(result);
   } catch (error) {
     res.status(500).json({ error });
@@ -126,32 +137,92 @@ export const getParcel: RequestHandler<{ id: string }> = async (req: ExtendedReq
   }
 };
 
-export const getParcelByEmail: RequestHandler<{email: string}> = async (
-  req: ExtendedRequest, 
+// export const getParcelByEmail: RequestHandler = async (
+//   req: ExtendedRequest, 
+//   res: Response
+// ): Promise<void> => {
+//   try {
+//     const email = req.query.email as string;
+//     const role = req.query.role as string; // 'sender' or 'receiver'
+
+//     if (!email) {
+//       res.status(400).json({ message: "Email query parameter is required" });
+//       return;
+//     }
+
+//     // Ensure role is valid
+//     const validRole = role === 'sender' || role === 'receiver' ? role : null;
+
+//     // Execute stored procedure with the role filter
+//     const result = await db.exec("getParcelsByEmail", { email, role: validRole || '' });
+
+//     if (!result[0]) {
+//       res.status(404).json({ message: "Parcel Not Found" });
+//     } else {
+//       res.status(200).json(result);
+//     }
+//   } catch (error) {
+//     res.status(500).json({ error: "Internal Server Error" });
+//   }
+// };
+
+export const getParcelsByEmail: RequestHandler = async (
+  req: ExtendedRequest,
   res: Response
-):Promise<void> => {
+): Promise<any> => {
   try {
-    // Extract the email from query parameters
-    const email = req.query.email as string;
+    const { senderEmail, receiverEmail } = req.query;
+    let result;
 
-    // Check if email is provided
-    if (!email) {
-      res.status(400).json({ message: "Email query parameter is required" });
-    }
-
-    // Execute the stored procedure 'getParcelsByEmail'
-    const result = await db.exec("getParcelsByEmail", { email });
-
-    // Check if the result returned any records
-    if (!result[0]) {
-      res.status(404).json({ message: "Parcel Not Found" });
+    if (senderEmail && typeof senderEmail === "string") {
+      const cleanSenderEmail = senderEmail.replace(/['"]/g, "");
+      result = await db.exec("getParcelsByEmail", { email: cleanSenderEmail, role: 'sender' });
+    } else if (receiverEmail && typeof receiverEmail === "string") {
+      const cleanReceiverEmail = receiverEmail.replace(/['"]/g, "");
+      result = await db.exec("getParcelsByEmail", { email: cleanReceiverEmail, role: 'receiver' });
     } else {
-      res.status(200).json(result);
+      result = await db.exec("getAllParcels");
     }
+
+    if (!result || result.length === 0) {
+      return res.status(404).json({ message: "No parcels found" });
+    }
+
+    res.status(200).json(result);
   } catch (error) {
-    res.status(404).json({ error });
+    res.status(500).json({ error });
   }
 };
+
+
+
+// export const getParcelByEmail: RequestHandler<{ email: string }> = async (
+//   req: ExtendedRequest, 
+//   res: Response
+// ): Promise<void> => {
+//   try {
+//     // Extract the email from query parameters
+//     const email = req.query.email as string;
+
+//     // Check if email is provided
+//     if (!email) {
+//       res.status(400).json({ message: "Email query parameter is required" });
+//       return;
+//     }
+
+//     // Execute the stored procedure 'getParcelsByEmail'
+//     const result = await db.exec("getParcelsByEmail", { email });
+
+//     // Check if the result returned any records
+//     if (!result[0]) {
+//       res.status(404).json({ message: "Parcel Not Found" });
+//     } else {
+//       res.status(200).json(result);
+//     }
+//   } catch (error) {
+//     res.status(404).json({ error });
+//   }
+// };
 
 export const deleteParcel: RequestHandler<{ id: string }> = async (req, res): Promise<void> => {
   try {
