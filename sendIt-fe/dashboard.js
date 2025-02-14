@@ -249,16 +249,68 @@ const getAllParcels = async () => {
             }
             const parcelsSent = await sentResponse.json();
             console.log("Parcels Sent:", parcelsSent);
-            if(parcelsSent){
-                
-            }
+            if(parcelsSent.length > 0){
+                tableBody.innerHTML = "";
+                for(parcel of parcelsSent){
+                    const senderLocation = await getLocationName(parcel.senderLat, parcel.senderLng);
+                const receiverLocation = await getLocationName(parcel.receiverLat, parcel.receiverLng);
 
+                let fetchedParcel = document.createElement('tr');
+                fetchedParcel.innerHTML = `
+                    <td>${parcel.senderEmail}</td>
+                    <td>${parcel.receiverEmail}</td>
+                    <td>${senderLocation}</td>
+                    <td>${receiverLocation}</td>
+                    <td>${parcel.dispatchedDate.split('T')[0]}</td>
+                    <td>${parcel.deliveryDate.split('T')[0]}</td>
+                    <td>${parcel.deliveryStatus}</td>
+                    <td>
+                        <div class="action-btns">
+                            <button class="parcelDetailsBtn" data-id="${parcel.id}">View</button>
+                        </div>
+                    </td>
+                `;
+
+                tableBody.appendChild(fetchedParcel);
+                }
+            }
+            
+            document.getElementById("incoming").addEventListener("click", async (event) => {
+                event.preventDefault();
+            
             const receivedResponse = await fetch(receivedParcels);
             if (!receivedResponse.ok) {
                 throw new Error(`Response status: ${receivedResponse.status}`);
             }
             const parcelsReceived = await receivedResponse.json();
+            if(parcelsReceived.length > 0){
+                tableBody.innerHTML = "";
+
+                for(parcel of parcelsReceived){
+                    const senderLocation = await getLocationName(parcel.senderLat, parcel.senderLng);
+                const receiverLocation = await getLocationName(parcel.receiverLat, parcel.receiverLng);
+
+                let fetchedParcel = document.createElement('tr');
+                fetchedParcel.innerHTML = `
+                    <td>${parcel.senderEmail}</td>
+                    <td>${parcel.receiverEmail}</td>
+                    <td>${senderLocation}</td>
+                    <td>${receiverLocation}</td>
+                    <td>${parcel.dispatchedDate.split('T')[0]}</td>
+                    <td>${parcel.deliveryDate.split('T')[0]}</td>
+                    <td>${parcel.deliveryStatus}</td>
+                    <td>
+                        <div class="action-btns">
+                            <button class="parcelDetailsBtn" data-id="${parcel.id}">View</button>
+                        </div>
+                    </td>
+                `;
+
+                tableBody.appendChild(fetchedParcel);
+                }
+            }
             console.log("Parcels Received:", parcelsReceived);
+        })
 
         } catch (error) {
             console.error("Error fetching user parcels:", error);

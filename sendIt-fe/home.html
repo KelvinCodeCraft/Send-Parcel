@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Send It - Home</title>
+    <link rel="stylesheet" href="home.css">
+    <script defer src="app.js"></script>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">Send It</div>
+            <div class="cta">
+                <!-- <button id="signup-btn" onclick="route()">Sign Up</button>
+                <button id="login">Login</button> -->
+                <a href="" id="signup-btn" class="btn" data-cy="signup-btn">Sign Up</a> 
+                <a href="" id="login-btn" class="btn" data-cy="login-btn">Login</a>
+            </div>
+        </nav>
+    </header>
+    <section>
+        <div class="hero">
+            <div class="hero-content">
+                <h1>Welcome to Send It</h1>
+                <p>Your reliable parcel delivery service.</p>
+            </div>
+        </div>
+        <div class="features">
+            <div class="feature">
+                <h2>Fast Delivery</h2>
+                <p>Get your parcels delivered in no time with our fast and reliable service.</p>
+            </div>
+            <div class="feature">
+                <h2>Secure Packaging</h2>
+                <p>We ensure your parcels are securely packaged to prevent any damage.</p>
+            </div>
+            <div class="feature">
+                <h2>24/7 Support</h2>
+                <p>Our support team is available 24/7 to assist you with any queries.</p>
+            </div>
+        </div>
+        <div class="about">
+            <h2>About Us</h2>
+            <p>Send It is a leading parcel delivery service provider, committed to ensuring your packages are delivered safely and on time.</p>
+        </div>
+    </section>
+    <footer>
+        <p>&copy; 2025 Send It. All rights reserved.</p>
+    </footer>
+
+    <script defer>
+        const signUpBtn = document.getElementById('signup-btn');
+        document.addEventListener('DOMContentLoaded', () => {
+            const signUpBtn = document.getElementById('signup-btn');
+            signUpBtn.addEventListener('click', (event) => {
+                event.preventDefault();
+                console.log('Clicked');
+                window.location.href = 'index.html';
+            });
+            const loginBtn = document.getElementById('login-btn');
+            loginBtn.addEventListener('click', (event) => {
+                event.preventDefault();
+                console.log('Clicked');
+                window.location.href = 'index.html';
+            });
+            
+        });
+    </script>
+</body>
+</html>
