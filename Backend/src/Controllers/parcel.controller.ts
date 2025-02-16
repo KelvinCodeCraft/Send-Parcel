@@ -65,7 +65,7 @@ export const addParcel = async (req: ExtendedRequest, res: Response): Promise<an
 
     // Calculate the distance between sender and receiver
     const distance = calculateDistance(parseFloat(senderLat), parseFloat(senderLng), parseFloat(receiverLat), parseFloat(receiverLng));
-    const price = distance; // 1 dollar per kilometer
+    const price = distance.toFixed(2); // 1 dollar per kilometer
 
     // Ensure database connection is available
     if (!db || !db.exec) {
@@ -94,8 +94,22 @@ export const addParcel = async (req: ExtendedRequest, res: Response): Promise<an
       if (!result || result.length === 0) {
         return res.status(500).json({ message: "Failed to create parcel" });
       }
-
+      console.log(result);
+      
       const parcelId = result[0].id; 
+
+      // Send SMS
+      await fetch("http://localhost:5000/send-sms", {
+        method: "POST", 
+        headers: {
+          "Content-Type": "application/json", 
+        },
+        body: JSON.stringify({ 
+          to: receiverNumber, 
+          message: "Your parcel is on the way." 
+        }), 
+      });
+      
       return res.status(200).json({ message: "Parcel created successfully", parcelId, price });
     } catch (dbError) {
       console.error("Database Execution Error:", dbError);

@@ -18,7 +18,7 @@ logout.addEventListener("click", () => {
     alert('Are you sure you want to log out?')
 
     localStorage.clear();
-    window.location.href = "/";
+    window.location.href = "http://127.0.0.1:5502/sendIt-fe/index.html";
 })
 
 openParcelForm.addEventListener('click', () => {
@@ -249,6 +249,10 @@ const getAllParcels = async () => {
             }
             const parcelsSent = await sentResponse.json();
             console.log("Parcels Sent:", parcelsSent);
+            // if(parcelsSent.length == 0 || parcelsReceived.length == 0){
+            //     const noParcel = document.getElementById('no-parcels')
+            //     noParcel.style.display = 'none'
+            // }
             if(parcelsSent.length > 0){
                 tableBody.innerHTML = "";
                 for(parcel of parcelsSent){
