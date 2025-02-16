@@ -14,13 +14,11 @@ export const LoginSchema = Joi.object({
 });
 
 export const ParcelSchema = Joi.object({
-  senderName: Joi.string().required(),
-  receiverName: Joi.string().required(),
+  senderNumber: Joi.string().required(),
+  receiverNumber: Joi.string().required(),
   senderEmail: Joi.string().required(),
   receiverEmail: Joi.string().required(),
   dispatchedDate: Joi.string().required(),
-  deliveryDate: Joi.string().required(),
-  parcelWeight: Joi.number().required(),
   price: Joi.number().required(),
   deliveryStatus: Joi.string().required(),
 

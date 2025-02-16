@@ -1,7 +1,7 @@
 USE [SENDIT]
 GO
 
-ALTER PROCEDURE getParcelsByEmail
+CREATE OR ALTER PROCEDURE getParcelsByEmail
     @email VARCHAR(200),
     @role VARCHAR(10) -- 'sender' or 'receiver'
 AS
@@ -13,12 +13,10 @@ BEGIN
         SELECT 
             id,
             senderEmail,
-            senderName,
-            receiverName,
             receiverEmail,
+			senderNumber,
+			receiverNumber,
             dispatchedDate,
-            deliveryDate,
-            parcelWeight,
             price,
             receiverLat,
             receiverLng,
@@ -33,12 +31,10 @@ BEGIN
         SELECT 
             id,
             senderEmail,
-            senderName,
-            receiverName,
             receiverEmail,
+			senderNumber,
+			receiverNumber,
             dispatchedDate,
-            deliveryDate,
-            parcelWeight,
             price,
             receiverLat,
             receiverLng,
@@ -54,12 +50,10 @@ BEGIN
         SELECT 
             id,
             senderEmail,
-            senderName,
-            receiverName,
             receiverEmail,
+			senderNumber,
+			receiverNumber,
             dispatchedDate,
-            deliveryDate,
-            parcelWeight,
             price,
             receiverLat,
             receiverLng,
@@ -70,3 +64,4 @@ BEGIN
         WHERE senderEmail = @email OR receiverEmail = @email;
     END
 END;
+

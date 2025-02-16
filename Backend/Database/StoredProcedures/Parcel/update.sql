@@ -4,13 +4,11 @@ GO
 CREATE PROCEDURE ProjectCreateOrUpdate
     @id UNIQUEIDENTIFIER,
     @senderEmail VARCHAR(200),
-    @senderName VARCHAR(200),
-    @receiverName VARCHAR(200),
+    @senderNumber VARCHAR(200),
+    @receiverNumber VARCHAR(200),
     @receiverEmail VARCHAR(200),
     @dispatchedDate DATE,
-    @deliveryDate DATE,
-    @parcelWeight INT,
-    @price INT,
+    @price FLOAT,
     @receiverLat VARCHAR(200),
     @receiverLng VARCHAR(200),
     @senderLat VARCHAR(200),
@@ -23,12 +21,10 @@ BEGIN
     UPDATE dbo.PARCEL
     SET 
         senderEmail    = @senderEmail,
-        senderName     = @senderName,
-        receiverName   = @receiverName,
+        senderNumber     = @senderNumber,
+        receiverNumber   = @receiverNumber,
         receiverEmail  = @receiverEmail,
         dispatchedDate = @dispatchedDate,
-        deliveryDate   = @deliveryDate,
-        parcelWeight   = @parcelWeight,
         price          = @price,
         receiverLat    = @receiverLat,
         receiverLng    = @receiverLng,
@@ -40,3 +36,5 @@ BEGIN
     SELECT * FROM dbo.PARCEL WHERE id = @id;
 END;
 GO
+
+

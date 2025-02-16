@@ -4,13 +4,11 @@ GO
 -- Now create the stored procedure for inserting a new parcel.
 CREATE PROCEDURE createParcel (
     @senderEmail VARCHAR(200),
-    @senderName VARCHAR(200), 
-    @receiverName VARCHAR(200),
+    @senderNumber VARCHAR(200),
+    @receiverNumber VARCHAR(200),
     @receiverEmail VARCHAR(200),
     @dispatchedDate DATE,
-    @deliveryDate DATE,
-    @parcelWeight INT,
-    @price INT,
+    @price FLOAT,
     @receiverLat VARCHAR(200),
     @receiverLng VARCHAR(200),
     @senderLat VARCHAR(200),
@@ -22,35 +20,32 @@ BEGIN
     SET NOCOUNT ON;
 
     INSERT INTO dbo.PARCEL (
-      senderEmail,
-      senderName,
-      receiverName,
-      receiverEmail,
-      dispatchedDate,
-      deliveryDate,
-      parcelWeight,
-      price,
-      receiverLat,
-      receiverLng,
-      senderLat,
-      senderLng, 
-      deliveryStatus
+        senderEmail,
+        senderNumber,
+        receiverNumber,
+        receiverEmail,
+        dispatchedDate,
+        price,
+        receiverLat,
+        receiverLng,
+        senderLat,
+        senderLng, 
+        deliveryStatus
     )
     VALUES (
-      @senderEmail,
-      @senderName,
-      @receiverName,
-      @receiverEmail,
-      @dispatchedDate,
-      @deliveryDate,
-      @parcelWeight,
-      @price,
-      @receiverLat,
-      @receiverLng,
-      @senderLat,
-      @senderLng,
-      @deliveryStatus
+        @senderEmail,
+        @senderNumber,
+        @receiverNumber,
+        @receiverEmail,
+        @dispatchedDate,
+        @price,
+        @receiverLat,
+        @receiverLng,
+        @senderLat,
+        @senderLng,
+        @deliveryStatus
     );
+
+    SELECT SCOPE_IDENTITY() AS id;
 END;
 GO
-

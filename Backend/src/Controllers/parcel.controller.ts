@@ -7,14 +7,12 @@ import path from 'path';
 
 interface ExtendedRequest extends Request {
   body: {
-    senderName: string;
-    receiverName: string;
+    receiverNumber: string;
+    senderNumber: string;
     senderEmail: string;
     receiverEmail: string;
     dispatchedDate: string;
-    deliveryDate: string;
-    parcelWeight: string;
-    price: string;
+    price: number;
     receiverLat: string;
     receiverLng: string;
     senderLat: string;
@@ -30,17 +28,27 @@ interface ExtendedRequest extends Request {
   };
 }
 
+function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  const R = 6371; // Radius of the Earth in kilometers
+  const dLat = (lat2 - lat1) * (Math.PI / 180);
+  const dLon = (lon2 - lon1) * (Math.PI / 180);
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) *
+    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  const distance = R * c; // Distance in kilometers
+  return distance;
+}
+
 export const addParcel = async (req: ExtendedRequest, res: Response): Promise<any> => {
   try {
     const {
       senderEmail,
-      senderName,
-      receiverName,
+      receiverNumber,
+      senderNumber,
       receiverEmail,
       dispatchedDate,
-      deliveryDate,
-      parcelWeight,
-      price,
       receiverLat,
       receiverLng,
       senderLat,
@@ -55,6 +63,10 @@ export const addParcel = async (req: ExtendedRequest, res: Response): Promise<an
       return res.status(400).json({ error: error.details[0].message });
     }
 
+    // Calculate the distance between sender and receiver
+    const distance = calculateDistance(parseFloat(senderLat), parseFloat(senderLng), parseFloat(receiverLat), parseFloat(receiverLng));
+    const price = distance; // 1 dollar per kilometer
+
     // Ensure database connection is available
     if (!db || !db.exec) {
       console.error("Database connection error: db.exec is undefined");
@@ -63,22 +75,28 @@ export const addParcel = async (req: ExtendedRequest, res: Response): Promise<an
 
     // Execute stored procedure
     try {
-      await db.exec("createParcel", {
+      const result = await db.exec("createParcel", {
         senderEmail,
-        senderName,
-        receiverName,
+        receiverNumber,
+        senderNumber,
         receiverEmail,
         dispatchedDate,
-        deliveryDate,
-        parcelWeight,
-        price,
+        price: price.toString(), // Convert price to string
         receiverLat,
         receiverLng,
         senderLat,
         senderLng,
         deliveryStatus
       });
-      return res.status(200).json({ message: "Parcel created Successfully" });
+
+      console.log(result);
+      
+      if (!result || result.length === 0) {
+        return res.status(500).json({ message: "Failed to create parcel" });
+      }
+
+      const parcelId = result[0].id; 
+      return res.status(200).json({ message: "Parcel created successfully", parcelId, price });
     } catch (dbError) {
       console.error("Database Execution Error:", dbError);
       return res.status(500).json({ message: "Database execution error", error: dbError });
@@ -137,34 +155,6 @@ export const getParcel: RequestHandler<{ id: string }> = async (req: ExtendedReq
   }
 };
 
-// export const getParcelByEmail: RequestHandler = async (
-//   req: ExtendedRequest, 
-//   res: Response
-// ): Promise<void> => {
-//   try {
-//     const email = req.query.email as string;
-//     const role = req.query.role as string; // 'sender' or 'receiver'
-
-//     if (!email) {
-//       res.status(400).json({ message: "Email query parameter is required" });
-//       return;
-//     }
-
-//     // Ensure role is valid
-//     const validRole = role === 'sender' || role === 'receiver' ? role : null;
-
-//     // Execute stored procedure with the role filter
-//     const result = await db.exec("getParcelsByEmail", { email, role: validRole || '' });
-
-//     if (!result[0]) {
-//       res.status(404).json({ message: "Parcel Not Found" });
-//     } else {
-//       res.status(200).json(result);
-//     }
-//   } catch (error) {
-//     res.status(500).json({ error: "Internal Server Error" });
-//   }
-// };
 
 export const getParcelsByEmail: RequestHandler = async (
   req: ExtendedRequest,
@@ -195,34 +185,6 @@ export const getParcelsByEmail: RequestHandler = async (
 };
 
 
-
-// export const getParcelByEmail: RequestHandler<{ email: string }> = async (
-//   req: ExtendedRequest, 
-//   res: Response
-// ): Promise<void> => {
-//   try {
-//     // Extract the email from query parameters
-//     const email = req.query.email as string;
-
-//     // Check if email is provided
-//     if (!email) {
-//       res.status(400).json({ message: "Email query parameter is required" });
-//       return;
-//     }
-
-//     // Execute the stored procedure 'getParcelsByEmail'
-//     const result = await db.exec("getParcelsByEmail", { email });
-
-//     // Check if the result returned any records
-//     if (!result[0]) {
-//       res.status(404).json({ message: "Parcel Not Found" });
-//     } else {
-//       res.status(200).json(result);
-//     }
-//   } catch (error) {
-//     res.status(404).json({ error });
-//   }
-// };
 
 export const deleteParcel: RequestHandler<{ id: string }> = async (req, res): Promise<void> => {
   try {
@@ -258,12 +220,10 @@ export const updateParcel: RequestHandler<{ id: string }> = async (req, res): Pr
     
     const {
       senderEmail,
-      senderName,
-      receiverName,
+      receiverNumber,
+      senderNumber,
       receiverEmail,
       dispatchedDate,
-      deliveryDate,
-      parcelWeight,
       price,
       receiverLat,
       receiverLng,
@@ -279,12 +239,10 @@ export const updateParcel: RequestHandler<{ id: string }> = async (req, res): Pr
       await db.exec("ProjectCreateOrUpdate", {
         id,
         senderEmail,
-        senderName,
-        receiverName,
+        receiverNumber,
+        senderNumber,
         receiverEmail,
         dispatchedDate,
-        deliveryDate,
-        parcelWeight,
         price,
         receiverLat,
         receiverLng,
@@ -297,7 +255,7 @@ export const updateParcel: RequestHandler<{ id: string }> = async (req, res): Pr
       if (deliveryStatus === 'delivered') {
         // Send email to receiver and sender
         const templatePath = path.join(__dirname, '../../../templates', 'deliveryNotification.ejs');
-        const emailData = { senderName, receiverName, deliveryDate };
+        const emailData = { receiverNumber, senderNumber,  };
 
         console.log("Rendering EJS template with data:", emailData);
 

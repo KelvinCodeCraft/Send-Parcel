@@ -10,12 +10,8 @@ BEGIN
     SELECT 
         id,
         senderEmail,
-        senderName,
-        receiverName,
         receiverEmail,
-        dispatchedDate,
-        deliveryDate,
-        parcelWeight,
+		phoneNumber,
         price,
         receiverLat,
         receiverLng,

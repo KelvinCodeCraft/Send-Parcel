@@ -9,12 +9,10 @@ BEGIN
     SELECT 
         id,
         senderEmail,
-        senderName,
-        receiverName,
+		senderNumber,
+		receiverNumber,
         receiverEmail,
         dispatchedDate,
-        deliveryDate,
-        parcelWeight,
         price,
         receiverLat,
         receiverLng,
@@ -23,3 +21,5 @@ BEGIN
         deliveryStatus
     FROM dbo.PARCEL;
 END;
+
+

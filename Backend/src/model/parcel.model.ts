@@ -2,15 +2,14 @@ class CustomParcel {
     parcelID: number;
     sender: string;
     senderLocation: string;
-    parcelWeight: string;
-    price: string;
+    price: number;
     lat: number;
     lng: number;
     senderLat: number;
     senderLng: number;
     parcelDescription: string;
     receiverLocation: string;
-    receiverPhone: number;
+    receiverNumber: number;
     receiverEmail: string;
     deliveryDate: string;
     deliveryStatus: string;
@@ -19,15 +18,14 @@ class CustomParcel {
         parcelID: number,
         sender: string,
         senderLocation: string,
-        parcelWeight: string,
-        price: string,
+        price: number,
         lat: number,
         lng: number,
         senderLat: number,
         senderLng: number,
         parcelDescription: string,
         receiverLocation: string,
-        receiverPhone: number,
+        receiverNumber: number,
         receiverEmail: string,
         deliveryDate: string,
         deliveryStatus: string
@@ -35,7 +33,6 @@ class CustomParcel {
         this.parcelID = parcelID;
         this.sender = sender;
         this.senderLocation = senderLocation;
-        this.parcelWeight = parcelWeight;
         this.price = price;
         this.lat = lat;
         this.lng = lng;
@@ -43,7 +40,7 @@ class CustomParcel {
         this.senderLng = senderLng;
         this.parcelDescription = parcelDescription;
         this.receiverLocation = receiverLocation;
-        this.receiverPhone = receiverPhone;
+        this.receiverNumber = receiverNumber;
         this.receiverEmail = receiverEmail;
         this.deliveryDate = deliveryDate;
         this.deliveryStatus = deliveryStatus;

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Stripe Checkout</title>
+</head>
+<body>
+  <h1>Parcel Checkout</h1>
+  <button id="checkout-button">Checkout</button>
+
+  <script>
+    document.getElementById("checkout-button").addEventListener("click", async () => {
+      try {
+        // Replace with the actual parcel ID
+        const parcelId = 'your-parcel-id'; // Replace with the actual parcel ID
+
+        // Create a checkout session with the parcel ID
+        const response = await fetch("http://localhost:4000/api/payments/checkout-session", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ parcelId })
+        });
+
+        const data = await response.json();
+
+        if (data.url) {
+          window.location.href = data.url; 
+        } else {
+          console.error("Error: No URL received from server.");
+        }
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    });
+  </script>
+</body>
+</html>
