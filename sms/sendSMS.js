@@ -3,7 +3,7 @@ const router = express.Router();
 require('dotenv').config();
 
 const credentials = {
-    apiKey: process.env.AT_API_KEY, 
+    apiKey: 'atsk_435bff255cbae11780d1945ea99fcbbff1712856a62cf8afedfef94f064ac4fdbcb78b7b', 
     username: 'senditparcel'  
 };
 
