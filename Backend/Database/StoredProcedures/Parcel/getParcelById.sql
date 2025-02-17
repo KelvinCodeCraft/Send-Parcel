@@ -10,13 +10,15 @@ BEGIN
     SELECT 
         id,
         senderEmail,
+		senderNumber,
+		receiverNumber,
         receiverEmail,
-		phoneNumber,
+        dispatchedDate,
         price,
         receiverLat,
         receiverLng,
         senderLat,
-        senderLng,
+        senderLng, 
         deliveryStatus
     FROM dbo.PARCEL
     WHERE id = @id;
