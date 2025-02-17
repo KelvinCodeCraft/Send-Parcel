@@ -41,6 +41,103 @@ function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: numbe
   return distance;
 }
 
+// export const addParcel = async (req: ExtendedRequest, res: Response): Promise<any> => {
+//   try {
+//     const {
+//       senderEmail,
+//       receiverNumber,
+//       senderNumber,
+//       receiverEmail,
+//       dispatchedDate,
+//       receiverLat,
+//       receiverLng,
+//       senderLat,
+//       senderLng,
+//       deliveryStatus
+//     } = req.body;
+
+//     // Validate request body
+//     const { error, value } = ParcelSchema.validate(req.body);
+//     if (error) {
+//       console.error("Validation Error:", error.details[0].message);
+//       return res.status(400).json({ error: error.details[0].message });
+//     }
+
+//     // Calculate the distance between sender and receiver
+//     const distance = calculateDistance(parseFloat(senderLat), parseFloat(senderLng), parseFloat(receiverLat), parseFloat(receiverLng));
+//     const price = distance.toFixed(2); // 1 dollar per kilometer
+//     console.log(`price ${price}`);
+    
+
+//     // Ensure database connection is available
+//     if (!db || !db.exec) {
+//       console.error("Database connection error: db.exec is undefined");
+//       return res.status(500).json({ message: "Database connection error" });
+//     }
+
+//     // Execute stored procedure
+//     try {
+//         // const response = await fetch("http://127.0.0.1:3000/checkout-session", {
+//         //   method: "POST",
+//         //   headers: { "Content-Type": "application/json" },
+//         //   body: JSON.stringify({ 
+//         //     unit_amount: price, 
+//         //   }), 
+//         // });
+
+//         // const data = await response.json();
+        
+//         // if (data.url) {
+//         //   res.redirect(data.url);
+//         // } else {
+//         //   console.error("Error: No URL received from server.");
+//         // }
+//       const result = await db.exec("createParcel", {
+//         senderEmail,
+//         receiverNumber,
+//         senderNumber,
+//         receiverEmail,
+//         dispatchedDate,
+//         price: price.toString(), // Convert price to string
+//         receiverLat,
+//         receiverLng,
+//         senderLat,
+//         senderLng,
+//         deliveryStatus
+//       });
+
+//       console.log(result);
+      
+//       if (!result || result.length === 0) {
+//         return res.status(500).json({ message: "Failed to create parcel" });
+//       }
+//       console.log(result);
+      
+//       const parcelId = result[0].id; 
+
+//       // Send SMS
+//       await fetch("http://localhost:7000/send-sms", {
+//         method: "POST", 
+//         headers: {
+//           "Content-Type": "application/json", 
+//         },
+//         body: JSON.stringify({ 
+//           to: receiverNumber, 
+//           message: "Your parcel is on the way." 
+//         }), 
+//       });
+      
+//       return res.status(200).json({ message: "Parcel created successfully", parcelId, price });
+//     } catch (dbError) {
+//       console.error("Database Execution Error:", dbError);
+//       return res.status(500).json({ message: "Database execution error", error: dbError });
+//     }
+//   } catch (error) {
+//     console.error("Unexpected Error:", error);
+//     return res.status(500).json({ message: "Unexpected server error", error });
+//   }
+// };
+
 export const addParcel = async (req: ExtendedRequest, res: Response): Promise<any> => {
   try {
     const {
@@ -66,55 +163,11 @@ export const addParcel = async (req: ExtendedRequest, res: Response): Promise<an
     // Calculate the distance between sender and receiver
     const distance = calculateDistance(parseFloat(senderLat), parseFloat(senderLng), parseFloat(receiverLat), parseFloat(receiverLng));
     const price = distance.toFixed(2); // 1 dollar per kilometer
+    console.log(`price ${price}`);
 
-    // Ensure database connection is available
-    if (!db || !db.exec) {
-      console.error("Database connection error: db.exec is undefined");
-      return res.status(500).json({ message: "Database connection error" });
-    }
-
-    // Execute stored procedure
-    try {
-      const result = await db.exec("createParcel", {
-        senderEmail,
-        receiverNumber,
-        senderNumber,
-        receiverEmail,
-        dispatchedDate,
-        price: price.toString(), // Convert price to string
-        receiverLat,
-        receiverLng,
-        senderLat,
-        senderLng,
-        deliveryStatus
-      });
-
-      console.log(result);
-      
-      if (!result || result.length === 0) {
-        return res.status(500).json({ message: "Failed to create parcel" });
-      }
-      console.log(result);
-      
-      const parcelId = result[0].id; 
-
-      // Send SMS
-      await fetch("http://localhost:7000/send-sms", {
-        method: "POST", 
-        headers: {
-          "Content-Type": "application/json", 
-        },
-        body: JSON.stringify({ 
-          to: receiverNumber, 
-          message: "Your parcel is on the way." 
-        }), 
-      });
-      
-      return res.status(200).json({ message: "Parcel created successfully", parcelId, price });
-    } catch (dbError) {
-      console.error("Database Execution Error:", dbError);
-      return res.status(500).json({ message: "Database execution error", error: dbError });
-    }
+    // Return a response (you can decide if you still need this endpoint for some other purpose)
+    return res.status(200).json({ message: "Parcel data validated successfully", price });
+    
   } catch (error) {
     console.error("Unexpected Error:", error);
     return res.status(500).json({ message: "Unexpected server error", error });

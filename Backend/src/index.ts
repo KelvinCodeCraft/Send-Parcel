@@ -1,12 +1,12 @@
 import express, { Express } from 'express';
 import dotenv from 'dotenv';
 import path from 'path';
-import cors from 'cors';
 import sendWelcomeEmail from '../background/Email/mail.service';
 import router from './Routers/user.router';
 import routerp from './Routers/parcel.router';
 import paymentRouter from './Routers/payment.router';
 import cron from 'node-cron';
+import cors from 'cors';
 
 dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 
@@ -14,11 +14,17 @@ const PORT = process.env.PORT || 4000;
 const app: Express = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cors());
+app.use(
+    cors({
+      origin: "*", // Allow only your frontend
+      methods: "GET,POST,PUT,DELETE",
+      allowedHeaders: "Content-Type,Authorization",
+    })
+  );
 
 app.use('/api/users', router);
 app.use('/parcel', routerp);
-app.use('/api/payments', paymentRouter); 
+app.use('/', paymentRouter); 
 
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);

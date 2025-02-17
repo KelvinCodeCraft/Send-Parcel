@@ -95,7 +95,10 @@ document.getElementById("parcelForm").addEventListener("submit", async (event) =
     const receiverLng = sessionStorage.getItem('receiverLng') || null;
     const senderLat = sessionStorage.getItem('senderLat') || null;
     const senderLng = sessionStorage.getItem('senderLng') || null;
-    const price = 0;
+    // const price = 0;
+    const distance = calculateDistance(parseFloat(senderLat), parseFloat(senderLng), parseFloat(receiverLat), parseFloat(receiverLng));
+    const price = distance.toFixed(2); // 1 dollar per kilometer
+    console.log(`price ${price}`);
 
     if (!senderEmail || !senderNumber || !receiverEmail || !receiverNumber || !dispatchedDate) {
         console.log('Incomplete form submission.');
@@ -141,13 +144,35 @@ document.getElementById("parcelForm").addEventListener("submit", async (event) =
             });
         }
 
-        const data = await response.json();
+        // Check if the response is JSON before parsing
+        const contentType = response.headers.get('Content-Type');
+        let data;
+        if (contentType && contentType.includes('application/json')) {
+            data = await response.json();
+        } else {
+            const responseText = await response.text(); // Log the raw response text
+            console.error('Expected JSON but received:', responseText);
+            throw new Error('Unexpected response format');
+        }
+
         console.log(`Res data ${data}`);
-        
 
         if (!response.ok) {
             console.error("API Error:", data);
             throw new Error(data.message || "Failed to process request.");
+        }
+
+        const stripeResponse = await fetch("http://localhost:4000/payment/checkout", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ price: price })
+        });
+
+        const stripeData = await stripeResponse.json();
+        if (stripeData.url) {
+            window.location.href = stripeData.url; // Redirect to Stripe Checkout
+        } else {
+            console.error("Error: No URL received from backend.");
         }
 
         formSuccess.textContent = parcelId ? "Parcel updated successfully!" : "Parcel added successfully!";
@@ -174,6 +199,18 @@ document.getElementById("parcelForm").addEventListener("submit", async (event) =
 });
 
 
+function calculateDistance(lat1, lon1, lat2, lon2) {
+    const R = 6371; // Radius of the Earth in kilometers
+    const dLat = (lat2 - lat1) * (Math.PI / 180);
+    const dLon = (lon2 - lon1) * (Math.PI / 180);
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) *
+      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const distance = R * c; // Distance in kilometers
+    return distance;
+  }
 
 const getLocationName = async (lat, lng) => {
     const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${apiKey}`;
