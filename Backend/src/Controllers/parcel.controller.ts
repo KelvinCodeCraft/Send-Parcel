@@ -41,6 +41,86 @@ function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: numbe
   return distance;
 }
 
+// export const addParcel = async (req: ExtendedRequest, res: Response): Promise<any> => {
+//   try {
+//     const {
+//       senderEmail,
+//       receiverNumber,
+//       senderNumber,
+//       receiverEmail,
+//       dispatchedDate,
+//       receiverLat,
+//       receiverLng,
+//       senderLat,
+//       senderLng,
+//       deliveryStatus
+//     } = req.body;
+
+//     // Validate request body
+//     const { error, value } = ParcelSchema.validate(req.body);
+//     if (error) {
+//       console.error("Validation Error:", error.details[0].message);
+//       return res.status(400).json({ error: error.details[0].message });
+//     }
+
+//     // Calculate the distance between sender and receiver
+//     const distance = calculateDistance(parseFloat(senderLat), parseFloat(senderLng), parseFloat(receiverLat), parseFloat(receiverLng));
+//     const price = distance.toFixed(2); 
+
+//     if (!db || !db.exec) {
+//       console.error("Database connection error: db.exec is undefined");
+//       return res.status(500).json({ message: "Database connection error" });
+//     }
+
+//     // Execute stored procedure
+//     try {
+//       const result = await db.exec("createParcel", {
+//         senderEmail,
+//         receiverNumber,
+//         senderNumber,
+//         receiverEmail,
+//         dispatchedDate,
+//         price: price.toString(), // Convert price to string
+//         receiverLat,
+//         receiverLng,
+//         senderLat,
+//         senderLng,
+//         deliveryStatus
+//       });
+
+//       console.log(result);
+      
+//       if (!result || result.length === 0) {
+//         return res.status(500).json({ message: "Failed to create parcel" });
+//       }
+//       console.log(result);
+      
+//       const parcelId = result[0].id; 
+
+//       // Send SMS
+//       await fetch("http://localhost:5000/send-sms", {
+//         method: "POST", 
+//         headers: {
+//           "Content-Type": "application/json", 
+//         },
+//         body: JSON.stringify({ 
+//           to: receiverNumber, 
+//           message: "Your parcel is on the way." 
+//         }), 
+//       });
+
+      
+      
+//       return res.status(200).json({ message: "Parcel created successfully", parcelId, price });
+//     } catch (dbError) {
+//       console.error("Database Execution Error:", dbError);
+//       return res.status(500).json({ message: "Database execution error", error: dbError });
+//     }
+//   } catch (error) {
+//     console.error("Unexpected Error:", error);
+//     return res.status(500).json({ message: "Unexpected server error", error });
+//   }
+// };
 export const addParcel = async (req: ExtendedRequest, res: Response): Promise<any> => {
   try {
     const {
@@ -57,23 +137,22 @@ export const addParcel = async (req: ExtendedRequest, res: Response): Promise<an
     } = req.body;
 
     // Validate request body
-    const { error, value } = ParcelSchema.validate(req.body);
+    const { error } = ParcelSchema.validate(req.body);
     if (error) {
       console.error("Validation Error:", error.details[0].message);
       return res.status(400).json({ error: error.details[0].message });
     }
 
-    // Calculate the distance between sender and receiver
+    // Calculate distance and price
     const distance = calculateDistance(parseFloat(senderLat), parseFloat(senderLng), parseFloat(receiverLat), parseFloat(receiverLng));
-    const price = distance.toFixed(2); // 1 dollar per kilometer
+    const price = parseFloat(distance.toFixed(2)) * 100; // Convert to cents
 
-    // Ensure database connection is available
     if (!db || !db.exec) {
       console.error("Database connection error: db.exec is undefined");
       return res.status(500).json({ message: "Database connection error" });
     }
 
-    // Execute stored procedure
+    // Store parcel in database
     try {
       const result = await db.exec("createParcel", {
         senderEmail,
@@ -81,7 +160,7 @@ export const addParcel = async (req: ExtendedRequest, res: Response): Promise<an
         senderNumber,
         receiverEmail,
         dispatchedDate,
-        price: price.toString(), // Convert price to string
+        price: price.toString(), 
         receiverLat,
         receiverLng,
         senderLat,
@@ -89,28 +168,47 @@ export const addParcel = async (req: ExtendedRequest, res: Response): Promise<an
         deliveryStatus
       });
 
-      console.log(result);
-      
       if (!result || result.length === 0) {
         return res.status(500).json({ message: "Failed to create parcel" });
       }
-      console.log(result);
-      
-      const parcelId = result[0].id; 
 
-      // Send SMS
+      const parcelId = result[0].id;
+
+      // Send SMS to receiver
       await fetch("http://localhost:5000/send-sms", {
-        method: "POST", 
-        headers: {
-          "Content-Type": "application/json", 
-        },
-        body: JSON.stringify({ 
-          to: receiverNumber, 
-          message: "Your parcel is on the way." 
-        }), 
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          to: receiverNumber,
+          message: `Your parcel is on the way. Tracking ID: ${parcelId}`
+        }),
       });
-      
-      return res.status(200).json({ message: "Parcel created successfully", parcelId, price });
+
+      console.log(`SMS sent to ${receiverNumber}`);
+
+      // Create checkout session for payment
+      const paymentResponse = await fetch("http://localhost:3200/checkout-session", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ price }), 
+      });
+
+      const paymentData = await paymentResponse.json();
+
+      if (!paymentData.url) {
+        console.error("Error: Payment session URL not received");
+        return res.status(500).json({ message: "Failed to create payment session" });
+      }
+
+      return res.status(200).json({ 
+        message: "Parcel created successfully",
+        parcelId,
+        price, 
+        checkoutUrl: paymentData.url // Send the payment URL to the frontend
+      });
+
     } catch (dbError) {
       console.error("Database Execution Error:", dbError);
       return res.status(500).json({ message: "Database execution error", error: dbError });

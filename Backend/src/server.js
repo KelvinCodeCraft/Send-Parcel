@@ -30,7 +30,7 @@ app.post('/checkout-session', async (req, res) => {
             cancel_url: 'http://localhost:5500/cancel.html',
         });
 
-        res.json({ url: session.url }); // Send session URL to frontend
+        res.json({ url: session.url }); 
     } catch (error) {
         console.error("Error:", error);
         res.status(500).json({ error: error.message });

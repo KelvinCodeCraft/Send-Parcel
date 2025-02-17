@@ -8,19 +8,34 @@
 
   <script>
     document.getElementById("checkout-button").addEventListener("click", async () => {
-        try {
-        const response = await fetch("http://127.0.0.1:3000/checkout-session", {
+      try {
+        // Step 1: Create a parcel and get the checkout URL
+        const parcelResponse = await fetch("http://localhost:4000/parcels", { 
           method: "POST",
           headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            senderEmail: "sender@example.com",
+            receiverNumber: "1234567890",
+            senderNumber: "0987654321",
+            receiverEmail: "receiver@example.com",
+            dispatchedDate: new Date().toISOString(),
+            receiverLat: "40.7128",
+            receiverLng: "-74.0060",
+            senderLat: "34.0522",
+            senderLng: "-118.2437",
+            deliveryStatus: "pending"
+          }),
         });
 
-        const data = await response.json();
-        
-        if (data.url) {
-          window.location.href = data.url; 
-        } else {
-          console.error("Error: No URL received from server.");
+        const parcelData = await parcelResponse.json();
+
+        if (!parcelData.checkoutUrl) {
+          console.error("Error: No checkout URL received.");
+          return;
         }
+
+        // Step 2: Redirect to Stripe Checkout
+        window.location.href = parcelData.checkoutUrl;
       } catch (error) {
         console.error("Error:", error);
       }
