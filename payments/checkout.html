@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Stripe Checkout</title>
+</head>
+<body>
+  <button id="checkout-button">Checkout</button>
+
+  <script>
+    document.getElementById("checkout-button").addEventListener("click", async () => {
+        try {
+        const response = await fetch("http://127.0.0.1:3000/checkout-session", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+        });
+
+        const data = await response.json();
+        
+        if (data.url) {
+          window.location.href = data.url; 
+        } else {
+          console.error("Error: No URL received from server.");
+        }
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    });
+  </script>
+</body>
+</html>
