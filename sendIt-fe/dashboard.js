@@ -34,12 +34,12 @@ const userRole = JSON.parse(localStorage.getItem('is_admin'));
 const formBtn = document.querySelector('.add-btn');
 const editBtns = document.querySelectorAll('.edit-btn')
 
-if (!userRole) {
-    formBtn.style.display = 'none'
-    editBtns.forEach(editBtn => {
-        editBtn.style.display = 'none';
-    });
-}
+// if (!userRole) {
+//     formBtn.style.display = 'none'
+//     editBtns.forEach(editBtn => {
+//         editBtn.style.display = 'none';
+//     });
+// }
 
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -86,20 +86,18 @@ document.getElementById("parcelForm").addEventListener("submit", async (event) =
     const parcelId = parcelForm.dataset.parcelId || null;
 
     const senderEmail = document.getElementById('senderEmail').value.trim();
-    const senderName = document.getElementById('senderName').value.trim();
+    const senderNumber = document.getElementById('senderNumber').value.trim();
     const receiverEmail = document.getElementById('receipientEmail').value.trim(); 
-    const receiverName = document.getElementById('recipientName').value.trim(); 
+    const receiverNumber = document.getElementById('receiverNumber').value.trim(); 
     const dispatchedDate = document.getElementById('dispatchDate').value.trim();
-    const deliveryDate = document.getElementById('deliveryDate').value.trim();
-    const parcelWeight = document.getElementById('weight').value.trim();
-    const price = document.getElementById('price').value.trim();
     const deliveryStatus = document.getElementById('status').value.trim();
     const receiverLat = sessionStorage.getItem('receiverLat') || null;
     const receiverLng = sessionStorage.getItem('receiverLng') || null;
     const senderLat = sessionStorage.getItem('senderLat') || null;
     const senderLng = sessionStorage.getItem('senderLng') || null;
+    const price = 0;
 
-    if (!senderEmail || !senderName || !receiverEmail || !receiverName || !dispatchedDate || !deliveryDate || !parcelWeight || !price) {
+    if (!senderEmail || !senderNumber || !receiverEmail || !receiverNumber || !dispatchedDate) {
         console.log('Incomplete form submission.');
 
         const formErrorMsg = document.getElementById("form-error");
@@ -114,18 +112,16 @@ document.getElementById("parcelForm").addEventListener("submit", async (event) =
     try {
         const newParcel = {
             senderEmail,
-            senderName,
+            senderNumber,
             receiverEmail,
-            receiverName,
+            receiverNumber,
             dispatchedDate,
-            deliveryDate,
-            parcelWeight,
-            price,
             deliveryStatus,
             receiverLat,
             receiverLng,
             senderLat,
-            senderLng
+            senderLng,
+            price
         };
 
         let response;
@@ -146,6 +142,8 @@ document.getElementById("parcelForm").addEventListener("submit", async (event) =
         }
 
         const data = await response.json();
+        console.log(`Res data ${data}`);
+        
 
         if (!response.ok) {
             console.error("API Error:", data);
@@ -218,7 +216,6 @@ const getAllParcels = async () => {
                     <td>${senderLocation}</td>
                     <td>${receiverLocation}</td>
                     <td>${parcel.dispatchedDate.split('T')[0]}</td>
-                    <td>${parcel.deliveryDate.split('T')[0]}</td>
                     <td>${parcel.deliveryStatus}</td>
                     <td>
                         <div class="action-btns">
@@ -266,7 +263,6 @@ const getAllParcels = async () => {
                     <td>${senderLocation}</td>
                     <td>${receiverLocation}</td>
                     <td>${parcel.dispatchedDate.split('T')[0]}</td>
-                    <td>${parcel.deliveryDate.split('T')[0]}</td>
                     <td>${parcel.deliveryStatus}</td>
                     <td>
                         <div class="action-btns">
@@ -350,14 +346,11 @@ const editParcel = async (parcelId) => {
         const parcel = await response.json();
 
         document.getElementById("senderEmail").value = parcel[0].senderEmail;
-        document.getElementById("senderName").value = parcel[0].senderName;
+        document.getElementById("senderNumber").value = parcel[0].senderNumber;
         document.getElementById("receipientEmail").value = parcel[0].receiverEmail;
-        document.getElementById("recipientName").value = parcel[0].receiverName;
+        document.getElementById("receiverNumber").value = parcel[0].receiverNumber;
         document.getElementById("dispatchDate").value = parcel[0].dispatchedDate.split('T')[0];
-        document.getElementById("deliveryDate").value = parcel[0].deliveryDate.split('T')[0];
-        document.getElementById("weight").value = parcel[0].parcelWeight;
-        document.getElementById("price").value = parcel[0].price;
-        // document.getElementById("status").value = parcel[0].deliveryStatus;
+        document.getElementById("status").value = parcel[0].deliveryStatus;
 
         document.getElementById("parcelForm").dataset.parcelId = parcelId;
 

@@ -46,15 +46,22 @@
                     <label for="senderEmail">Sender Email</label>
                     <input type="email" placeholder="example@email.com" id="senderEmail">
 
-                    <label for="senderName">Sender Name</label>
-                    <input type="text" id="senderName" placeholder="Name">
+                    <label for="senderName">Sender Phone Number</label>
+                    <input type="text" id="senderNumber" placeholder="+2547...">
 
                     <label for="receipientEmail">Recipient Email</label>
                     <input type="email" placeholder="example@email.com" id="receipientEmail">
 
-                    <label for="recipientName">Recipient Name</label>
-                    <input type="text" id="recipientName" placeholder="Name">
+                    <label for="recipientName">Recipient Phone Number</label>
+                    <input type="text" id="receiverNumber" placeholder="+2547...">
 
+                    
+
+
+                </div>
+
+                <!-- Right Column -->
+                <div>
                     <label for="recipientLocation">Recipient Location</label>
                     <select id="recipientLocation">
                         <option value="nyeri">Nyeri</option>
@@ -75,22 +82,8 @@
                     <input type="hidden" id="senderLatitude" name="senderLatitude">
                     <input type="hidden" id="senderLongitude" name="senderLongitude">
 
-
-                </div>
-
-                <!-- Right Column -->
-                <div>
-                    <label for="weight">Parcel Weight</label>
-                    <input type="number" placeholder="Weight" id="weight">
-
-                    <label for="price">Price</label>
-                    <input type="number" placeholder="Price" id="price">
-
                     <label for="dispatchDate">Dispatch Date</label>
                     <input type="date" id="dispatchDate">
-
-                    <label for="deliveryDate">Delivery Date</label>
-                    <input type="date" id="deliveryDate">
 
                     <label for="status">Delivery Status</label>
                     <select id="status">
@@ -117,7 +110,6 @@
                         <th>From</th>
                         <th>To</th>
                         <th>Dispatch Date</th>
-                        <th>Delivery Date</th>
                         <th>Status</th>
                         <th>Actions</th>
 

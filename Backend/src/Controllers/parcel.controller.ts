@@ -174,21 +174,9 @@ export const addParcel = async (req: ExtendedRequest, res: Response): Promise<an
 
       const parcelId = result[0].id;
 
-      // Send SMS to receiver
-      await fetch("http://localhost:5000/send-sms", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          to: receiverNumber,
-          message: `Your parcel is on the way. Tracking ID: ${parcelId}`
-        }),
-      });
-
-      console.log(`SMS sent to ${receiverNumber}`);
-
-      // Create checkout session for payment
-      const paymentResponse = await fetch("http://localhost:3200/checkout-session", {
-        method: "POST",
+      // Send SMS
+      const paymentResponse = await fetch("http://localhost:7000/send-sms", {
+        method: "POST", 
         headers: {
           "Content-Type": "application/json",
         },
@@ -365,6 +353,16 @@ export const updateParcel: RequestHandler<{ id: string }> = async (req, res): Pr
 
       // Check deliveryStatus data from req.body
       if (deliveryStatus === 'delivered') {
+        await fetch("http://localhost:7000/send-sms", {
+          method: "POST", 
+          headers: {
+            "Content-Type": "application/json", 
+          },
+          body: JSON.stringify({ 
+            to: receiverNumber, 
+            message: "Your parcel is on the way." 
+          }), 
+        });
         // Send email to receiver and sender
         const templatePath = path.join(__dirname, '../../../templates', 'deliveryNotification.ejs');
         const emailData = { receiverNumber, senderNumber,  };
@@ -382,14 +380,14 @@ export const updateParcel: RequestHandler<{ id: string }> = async (req, res): Pr
           const messageToSender = {
             from: process.env.EMAIL,
             to: senderEmail,
-            subject: "Parcel Delivered",
+            subject: "Parcel Delivery Notification",
             html
           };
 
           const messageToReceiver = {
             from: process.env.EMAIL,
             to: receiverEmail,
-            subject: "Parcel Delivered",
+            subject: "Parcel Delivery Notification",
             html
           };
 

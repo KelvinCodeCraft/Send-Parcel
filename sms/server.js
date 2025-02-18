@@ -1,12 +1,12 @@
 const express = require('express');
 const dotenv = require("dotenv");
-const smsRoute = require("./sendSMS"); // Corrected import
+const smsRoute = require("./sendSMS"); 
 const bodyParser = require("body-parser");
 
 dotenv.config();
 
 const app = express();
-const port = process.env.PORT || 6000;
+const port = 7000;
 
 // Middleware
 app.use(bodyParser.json());
