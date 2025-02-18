@@ -52,7 +52,7 @@ export const stripeWebhook = async (req: Request, res: Response): Promise<void> 
                 senderNumber,
                 receiverEmail,
                 dispatchedDate,
-                price: price.toString(),
+                price,
                 receiverLat,
                 receiverLng,
                 senderLat,
@@ -66,16 +66,16 @@ export const stripeWebhook = async (req: Request, res: Response): Promise<void> 
                 return;
             }
             // Send SMS
-            // await fetch("http://localhost:7000/send-sms", {
-            //     method: "POST",
-            //     headers: {
-            //     "Content-Type": "application/json",
-            //     },
-            //     body: JSON.stringify({
-            //     to: receiverNumber,
-            //     message: "Your parcel is on the way."
-            //     }),
-            // });
+            await fetch("http://localhost:7000/send-sms", {
+                method: "POST",
+                headers: {
+                "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                to: receiverNumber,
+                message: "Your parcel is on the way."
+                }),
+            });
   
 
             console.log("Parcel successfully saved after payment.");
