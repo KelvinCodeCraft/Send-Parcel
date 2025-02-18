@@ -16,6 +16,6 @@ const paymentRouter = express.Router();
 paymentRouter.post("/payment/checkout", createCheckoutSession);
 // paymentRouter.post("/payment/checkout/create-checkout-session", createCheckoutSession);
 
-paymentRouter.post("/payment/webhook", express.raw({ type: "application/json" }), stripeWebhook);
+// paymentRouter.post("/payment/webhook", express.raw({ type: "application/json" }), stripeWebhook);
 
 export default paymentRouter;

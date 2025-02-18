@@ -14,8 +14,8 @@ BEGIN
             id,
             senderEmail,
             receiverEmail,
-			senderNumber,
-			receiverNumber,
+            senderNumber,
+            receiverNumber,
             dispatchedDate,
             price,
             receiverLat,
@@ -32,8 +32,8 @@ BEGIN
             id,
             senderEmail,
             receiverEmail,
-			senderNumber,
-			receiverNumber,
+            senderNumber,
+            receiverNumber,
             dispatchedDate,
             price,
             receiverLat,
@@ -46,22 +46,7 @@ BEGIN
     END
     ELSE
     BEGIN
-        -- If no role is specified, return all parcels related to the email
-        SELECT 
-            id,
-            senderEmail,
-            receiverEmail,
-			senderNumber,
-			receiverNumber,
-            dispatchedDate,
-            price,
-            receiverLat,
-            receiverLng,
-            senderLat,
-            senderLng,
-            deliveryStatus
-        FROM dbo.PARCEL
-        WHERE senderEmail = @email OR receiverEmail = @email;
+        -- If role is invalid, return an error message
+        RAISERROR('Invalid role specified. Use "sender" or "receiver".', 16, 1);
     END
 END;
-

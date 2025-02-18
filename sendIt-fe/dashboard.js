@@ -165,7 +165,7 @@ document.getElementById("parcelForm").addEventListener("submit", async (event) =
         const stripeResponse = await fetch("http://localhost:4000/payment/checkout", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ price: price })
+            body: JSON.stringify(newParcel)
         });
 
         const stripeData = await stripeResponse.json();

@@ -7,11 +7,15 @@ import routerp from './Routers/parcel.router';
 import paymentRouter from './Routers/payment.router';
 import cron from 'node-cron';
 import cors from 'cors';
+import { stripeWebhook } from "../src/Controllers/webhook.controller";
+
 
 dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 
 const PORT = process.env.PORT || 4000;
 const app: Express = express();
+app.post("/payment/webhook", express.raw({ type: "application/json" }), stripeWebhook);
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(
