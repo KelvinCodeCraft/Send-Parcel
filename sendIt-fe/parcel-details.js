@@ -55,15 +55,9 @@ function fetchParcelDetails() {
 }
 
 function displayParcelDetails(parcel) {
-    document.getElementById("senderName").textContent = parcel.senderName;
     document.getElementById("senderEmail").textContent = parcel.senderEmail;
-    document.getElementById("receiverName").textContent = parcel.receiverName;
-    document.getElementById("receiverEmail").textContent = parcel.receiverEmail;
-    document.getElementById("parcelWeight").textContent = parcel.parcelWeight + " kg";
-    document.getElementById("price").textContent = "Ksh " + parcel.price;
     document.getElementById("deliveryStatus").textContent = parcel.deliveryStatus;
     document.getElementById("dispatchedDate").textContent = new Date(parcel.dispatchedDate).toLocaleDateString();
-    document.getElementById("deliveryDate").textContent = new Date(parcel.deliveryDate).toLocaleDateString();
 }
 
 function initMap(senderLat, senderLng, receiverLat, receiverLng) {

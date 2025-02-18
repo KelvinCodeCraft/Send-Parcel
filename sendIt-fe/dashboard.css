@@ -84,23 +84,29 @@ td button {
     font-size: large;
     border-radius: 8px;
 }
-
+.items {
+    width: 96%;
+    margin: auto;
+    background: white;
+    border-radius: 2px;
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
+  }
 table {
     font-family: arial, sans-serif;
     border-collapse: collapse;
-    width: 96%;
-    margin: auto;
+    width: 100%;
 }
 
 td,
 th {
-    border: 1px solid var(--primary);
+    border-bottom: 1px solid var(--primary);
     text-align: left;
-    padding: 8px;
+    padding: 12px;
 }
 
-tr:nth-child(even) {
+th {
     background-color: #dddddd;
+    color: var(--secondary);
 }
 
 .action-btns{

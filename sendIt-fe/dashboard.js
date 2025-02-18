@@ -212,7 +212,7 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
     return distance;
   }
 
-const getLocationName = async (lat, lng) => {
+  const getLocationName = async (lat, lng) => {
     const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${apiKey}`;
 
     try {
@@ -222,7 +222,13 @@ const getLocationName = async (lat, lng) => {
         const data = await response.json();
 
         if (data.status === "OK" && data.results.length > 0) {
-            return data.results[0].formatted_address; 
+            const addressComponents = data.results[0].formatted_address.split(", "); // Split address by commas
+
+            if (addressComponents.length >= 2) {
+                return addressComponents[addressComponents.length - 2]; // Get second last item
+            } else {
+                return data.results[0].formatted_address; // Fallback to full address
+            }
         } else {
             throw new Error("No results found");
         }
@@ -231,6 +237,15 @@ const getLocationName = async (lat, lng) => {
         return "Unknown location";
     }
 };
+
+const maskEmail = (email) => {
+    const [localPart, domain] = email.split("@"); // Split email into local and domain parts
+    if (!localPart || !domain) return email; // Return as-is if invalid email
+
+    const maskedLocal = localPart[0] + "*".repeat(localPart.length - 3) + localPart.slice(-2);
+    return `${maskedLocal}@${domain}`;
+};
+
 
 const getAllParcels = async () => {
     if (userRole) {
@@ -248,8 +263,8 @@ const getAllParcels = async () => {
 
                 let fetchedParcel = document.createElement('tr');
                 fetchedParcel.innerHTML = `
-                    <td>${parcel.senderEmail}</td>
-                    <td>${parcel.receiverEmail}</td>
+                    <td>${maskEmail(parcel.senderEmail)}</td>
+                    <td>${maskEmail(parcel.receiverEmail)}</td>
                     <td>${senderLocation}</td>
                     <td>${receiverLocation}</td>
                     <td>${parcel.dispatchedDate.split('T')[0]}</td>
@@ -295,8 +310,8 @@ const getAllParcels = async () => {
 
                 let fetchedParcel = document.createElement('tr');
                 fetchedParcel.innerHTML = `
-                    <td>${parcel.senderEmail}</td>
-                    <td>${parcel.receiverEmail}</td>
+                    <td>${maskEmail(parcel.senderEmail)}</td>
+                    <td>${maskEmail(parcel.receiverEmail)}</td>
                     <td>${senderLocation}</td>
                     <td>${receiverLocation}</td>
                     <td>${parcel.dispatchedDate.split('T')[0]}</td>
@@ -329,8 +344,8 @@ const getAllParcels = async () => {
 
                 let fetchedParcel = document.createElement('tr');
                 fetchedParcel.innerHTML = `
-                    <td>${parcel.senderEmail}</td>
-                    <td>${parcel.receiverEmail}</td>
+                    <td>${maskEmail(parcel.senderEmail)}</td>
+                    <td>${maskEmail(parcel.receiverEmail)}</td>
                     <td>${senderLocation}</td>
                     <td>${receiverLocation}</td>
                     <td>${parcel.dispatchedDate.split('T')[0]}</td>
