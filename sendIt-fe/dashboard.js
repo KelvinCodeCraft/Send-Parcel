@@ -414,19 +414,19 @@ const getAllParcels = async () => {
     }
 };
 
-prevPage.addEventListener("click", () => {
-    if (currentPage > 1) {
-        currentPage--;
-        renderTable();
-    }
-});
+// prevPage.addEventListener("click", () => {
+//     if (currentPage > 1) {
+//         currentPage--;
+//         renderTable();
+//     }
+// });
 
-nextPage.addEventListener("click", () => {
-    if ((currentPage * itemsPerPage) < parcelsData.length) {
-        currentPage++;
-        renderTable();
-    }
-});
+// nextPage.addEventListener("click", () => {
+//     if ((currentPage * itemsPerPage) < parcelsData.length) {
+//         currentPage++;
+//         renderTable();
+//     }
+// });
 
 getAllParcels()
 
