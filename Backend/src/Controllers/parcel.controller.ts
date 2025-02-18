@@ -60,7 +60,8 @@ export const addParcel = async (req: ExtendedRequest, res: Response): Promise<an
 
 export const getParcels: RequestHandler = async (
   req: ExtendedRequest,
-  res: Response): Promise<any> => {
+  res: Response
+): Promise<any> => {
   try {
     const { senderEmail, receiverEmail, status } = req.query;
     let result;
@@ -70,10 +71,16 @@ export const getParcels: RequestHandler = async (
       result = await db.exec("getParcelsByStatus", { status: cleanStatus });
     } else if (senderEmail && typeof senderEmail === "string") {
       const cleanSenderEmail = senderEmail.replace(/['"]/g, "");
-      result = await db.exec("getParcelsByEmail", { email: cleanSenderEmail, role: 'sender' });
+      result = await db.exec("getParcelsByEmail", { email: cleanSenderEmail, role: "sender" });
+
+      // Mark parcels as outgoing
+      result = result?.map(parcel => ({ ...parcel, type: "outgoing" }));
     } else if (receiverEmail && typeof receiverEmail === "string") {
       const cleanReceiverEmail = receiverEmail.replace(/['"]/g, "");
-      result = await db.exec("getParcelsByEmail", { email: cleanReceiverEmail, role: 'receiver' });
+      result = await db.exec("getParcelsByEmail", { email: cleanReceiverEmail, role: "receiver" });
+
+      // Mark parcels as incoming
+      result = result?.map(parcel => ({ ...parcel, type: "incoming" }));
     } else {
       result = await db.exec("getAllParcels");
     }
