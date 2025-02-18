@@ -23,14 +23,5 @@ const DBconfig = {
     }
   }
 
-  // async function test() {
-  //   try {
-  //     let pool = await mssql.connect(DBconfig)
-  //     let result = await pool.request().query('select * from users')
-  //     console.dir(result)
-  //   } catch (err) {
-  //     console.log(err)
-  //   }
-  // }
-  // test()
+
   export default DBconfig
