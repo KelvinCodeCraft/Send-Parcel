@@ -11,7 +11,7 @@ const closeParcelFrom = document.querySelector('.close-btn')
 const parcelForm = document.querySelector('.parcel-form')
 const formErrorMsg = document.getElementById("form-error");
 const formSuccess = document.querySelector(".formSuccess");
-let tableBody = document.querySelector(".items table tbody");
+tableBody = document.querySelector(".items table tbody");
 
 
 logout.addEventListener("click", () => {
@@ -232,6 +232,50 @@ const getLocationName = async (lat, lng) => {
     }
 };
 
+const itemsPerPage = 10;
+let currentPage = 1;
+let parcelsData = [];
+
+tableBody = document.getElementById("table-body"); // Ensure this matches your table's tbody ID
+const pageInfo = document.getElementById("page-info");
+const prevPage = document.getElementById("prevPage");
+const nextPage = document.getElementById("nextPage");
+
+const renderTable = () => {
+    tableBody.innerHTML = "";
+    const start = (currentPage - 1) * itemsPerPage;
+    const end = start + itemsPerPage;
+    const paginatedParcels = parcelsData.slice(start, end);
+
+    for (let parcel of paginatedParcels) {
+        const senderLocation = parcel.senderLocation || "Loading...";
+        const receiverLocation = parcel.receiverLocation || "Loading...";
+
+        let fetchedParcel = document.createElement('tr');
+        fetchedParcel.innerHTML = `
+            <td>${parcel.senderEmail}</td>
+            <td>${parcel.receiverEmail}</td>
+            <td>${senderLocation}</td>
+            <td>${receiverLocation}</td>
+            <td>${parcel.dispatchedDate.split('T')[0]}</td>
+            <td>${parcel.deliveryStatus}</td>
+            <td>
+                <div class="action-btns">
+                    ${!userRole ? `<button class="parcelDetailsBtn" data-id="${parcel.id}">View</button>` : ""}
+                    ${userRole ? `<button class="deleteParcel" data-id="${parcel.id}">Delete</button>` : ""}
+                    ${userRole ? `<button class="edit-btn" data-id="${parcel.id}">Edit</button>` : ""}
+                </div>
+            </td>
+        `;
+
+        tableBody.appendChild(fetchedParcel);
+    }
+
+    pageInfo.textContent = `Page ${currentPage} of ${Math.ceil(parcelsData.length / itemsPerPage)}`;
+    prevPage.disabled = currentPage === 1;
+    nextPage.disabled = end >= parcelsData.length;
+};
+
 const getAllParcels = async () => {
     if (userRole) {
         try {
@@ -354,6 +398,20 @@ const getAllParcels = async () => {
         }
     }
 };
+
+prevPage.addEventListener("click", () => {
+    if (currentPage > 1) {
+        currentPage--;
+        renderTable();
+    }
+});
+
+nextPage.addEventListener("click", () => {
+    if ((currentPage * itemsPerPage) < parcelsData.length) {
+        currentPage++;
+        renderTable();
+    }
+});
 
 getAllParcels()
 
