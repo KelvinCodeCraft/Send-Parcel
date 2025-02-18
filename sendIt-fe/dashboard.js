@@ -11,7 +11,7 @@ const closeParcelFrom = document.querySelector('.close-btn')
 const parcelForm = document.querySelector('.parcel-form')
 const formErrorMsg = document.getElementById("form-error");
 const formSuccess = document.querySelector(".formSuccess");
-const tableBody = document.querySelector(".items table tbody");
+const tableBody = document.getElementById("table-body"); 
 
 
 logout.addEventListener("click", () => {
@@ -414,19 +414,19 @@ const getAllParcels = async () => {
     }
 };
 
-// prevPage.addEventListener("click", () => {
-//     if (currentPage > 1) {
-//         currentPage--;
-//         renderTable();
-//     }
-// });
+prevPage.addEventListener("click", () => {
+    if (currentPage > 1) {
+        currentPage--;
+        renderTable();
+    }
+});
 
-// nextPage.addEventListener("click", () => {
-//     if ((currentPage * itemsPerPage) < parcelsData.length) {
-//         currentPage++;
-//         renderTable();
-//     }
-// });
+nextPage.addEventListener("click", () => {
+    if ((currentPage * itemsPerPage) < parcelsData.length) {
+        currentPage++;
+        renderTable();
+    }
+});
 
 getAllParcels()
 
