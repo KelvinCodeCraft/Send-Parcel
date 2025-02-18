@@ -11,7 +11,7 @@ const closeParcelFrom = document.querySelector('.close-btn')
 const parcelForm = document.querySelector('.parcel-form')
 const formErrorMsg = document.getElementById("form-error");
 const formSuccess = document.querySelector(".formSuccess");
-tableBody = document.querySelector(".items table tbody");
+const tableBody = document.querySelector(".items table tbody");
 
 
 logout.addEventListener("click", () => {
@@ -236,7 +236,7 @@ const itemsPerPage = 10;
 let currentPage = 1;
 let parcelsData = [];
 
-tableBody = document.getElementById("table-body"); // Ensure this matches your table's tbody ID
+// const tableBody = document.getElementById("table-body"); // Ensure this matches your table's tbody ID
 const pageInfo = document.getElementById("page-info");
 const prevPage = document.getElementById("prevPage");
 const nextPage = document.getElementById("nextPage");
@@ -409,6 +409,7 @@ prevPage.addEventListener("click", () => {
 nextPage.addEventListener("click", () => {
     if ((currentPage * itemsPerPage) < parcelsData.length) {
         currentPage++;
+        
         renderTable();
     }
 });
