@@ -3,8 +3,8 @@ const router = express.Router();
 require('dotenv').config();
 
 const credentials = {
-    apiKey: 'atsk_435bff255cbae11780d1945ea99fcbbff1712856a62cf8afedfef94f064ac4fdbcb78b7b', 
-    username: 'senditparcel'  
+    apiKey: process.env.AT_API_KEY, 
+    username: process.env.AT_USERNAME  
 };
 
 const AfricasTalking = require("africastalking")(credentials);
