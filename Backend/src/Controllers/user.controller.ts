@@ -44,9 +44,21 @@ export const createUser = async (req: ExtendedRequest, res: Response) => {
             if (userCreated){
                 
                 try {
+                    // Send SMS
+                    await fetch("http://localhost:7000/send-sms", {
+                        method: "POST",
+                        headers: {
+                        "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                        to: phone,
+                        message: "Welcome to SendIt, your go-to app for fast, secure, and hassle-free deliveries. Would like to send or receive parcels across the country? We've got you covered. Login to get started"
+                        }),
+                    });
                     console.log("JWT_SECRET:", process.env.JWT_SECRET);
                     const token = jwt.sign(user, process.env.JWT_SECRET as string, { expiresIn: '1d' });
                     console.log("Generated token:", token);
+
                     res.status(200).json({ token });
                 } catch (jwtError) {
                     const error = jwtError as Error;

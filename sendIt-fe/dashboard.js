@@ -11,7 +11,8 @@ const closeParcelFrom = document.querySelector('.close-btn')
 const parcelForm = document.querySelector('.parcel-form')
 const formErrorMsg = document.getElementById("form-error");
 const formSuccess = document.querySelector(".formSuccess");
-const tableBody = document.getElementById("table-body"); 
+const tableBody = document.getElementById("table-body");
+const table = document.querySelector(".items")
 
 
 logout.addEventListener("click", () => {
@@ -23,10 +24,12 @@ logout.addEventListener("click", () => {
 
 openParcelForm.addEventListener('click', () => {
     parcelForm.style.display = "block"
+    table.style.display = 'none'
 })
 
 closeParcelFrom.addEventListener('click', () => {
     parcelForm.style.display = 'none'
+    table.style.display = 'block'
 })
 
 const userRole = JSON.parse(localStorage.getItem('is_admin'));
@@ -87,8 +90,8 @@ document.getElementById("parcelForm").addEventListener("submit", async (event) =
 
     const senderEmail = document.getElementById('senderEmail').value.trim();
     const senderNumber = document.getElementById('senderNumber').value.trim();
-    const receiverEmail = document.getElementById('receipientEmail').value.trim(); 
-    const receiverNumber = document.getElementById('receiverNumber').value.trim(); 
+    const receiverEmail = document.getElementById('receipientEmail').value.trim();
+    const receiverNumber = document.getElementById('receiverNumber').value.trim();
     const dispatchedDate = document.getElementById('dispatchDate').value.trim();
     const deliveryStatus = document.getElementById('status').value.trim();
     const receiverLat = sessionStorage.getItem('receiverLat') || null;
@@ -113,6 +116,18 @@ document.getElementById("parcelForm").addEventListener("submit", async (event) =
     }
 
     try {
+        const usersResponse = await fetch("http://localhost:4000/api/users");
+        if (!usersResponse.ok) throw new Error("Failed to fetch registered users.");
+        
+        const users = await usersResponse.json();
+        const registeredEmails = users.map(user => user.email);
+
+        if (!registeredEmails.includes(receiverEmail)) {
+            const formErrorMsg = document.getElementById("form-error");
+            formErrorMsg.textContent = 'Recipient is not registered on SendIt.';
+            throw new Error("User not registered. Please enter a valid recipient email.");
+            
+        }
         const newParcel = {
             senderEmail,
             senderNumber,
@@ -162,17 +177,19 @@ document.getElementById("parcelForm").addEventListener("submit", async (event) =
             throw new Error(data.message || "Failed to process request.");
         }
 
-        const stripeResponse = await fetch("http://localhost:4000/payment/checkout", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(newParcel)
-        });
+        if(!parcelId){
+            const stripeResponse = await fetch("http://localhost:4000/payment/checkout", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(newParcel)
+            });
 
-        const stripeData = await stripeResponse.json();
-        if (stripeData.url) {
-            window.location.href = stripeData.url; // Redirect to Stripe Checkout
-        } else {
-            console.error("Error: No URL received from backend.");
+            const stripeData = await stripeResponse.json();
+            if (stripeData.url) {
+                window.location.href = stripeData.url;
+            } else {
+                console.error("Error: No URL received from backend.");
+            }
         }
 
         formSuccess.textContent = parcelId ? "Parcel updated successfully!" : "Parcel added successfully!";
@@ -204,15 +221,15 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
     const dLat = (lat2 - lat1) * (Math.PI / 180);
     const dLon = (lon2 - lon1) * (Math.PI / 180);
     const a =
-      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-      Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) *
-      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) *
+        Math.sin(dLon / 2) * Math.sin(dLon / 2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     const distance = R * c; // Distance in kilometers
     return distance;
-  }
+}
 
-  const getLocationName = async (lat, lng) => {
+const getLocationName = async (lat, lng) => {
     const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${apiKey}`;
 
     try {
@@ -286,7 +303,7 @@ const maskEmail = (email) => {
     const [localPart, domain] = email.split("@"); // Split email into local and domain parts
     if (!localPart || !domain) return email; // Return as-is if invalid email
 
-    const maskedLocal = localPart[0] + "*".repeat(localPart.length - 3) + localPart.slice(-2);
+    const maskedLocal = localPart[0] + localPart[1] + "*".repeat(localPart.length - 3) + localPart.slice(-2);
     return `${maskedLocal}@${domain}`;
 };
 
@@ -346,14 +363,14 @@ const getAllParcels = async () => {
             //     const noParcel = document.getElementById('no-parcels')
             //     noParcel.style.display = 'none'
             // }
-            if(parcelsSent.length > 0){
+            if (parcelsSent.length > 0) {
                 tableBody.innerHTML = "";
-                for(parcel of parcelsSent){
+                for (parcel of parcelsSent) {
                     const senderLocation = await getLocationName(parcel.senderLat, parcel.senderLng);
-                const receiverLocation = await getLocationName(parcel.receiverLat, parcel.receiverLng);
+                    const receiverLocation = await getLocationName(parcel.receiverLat, parcel.receiverLng);
 
-                let fetchedParcel = document.createElement('tr');
-                fetchedParcel.innerHTML = `
+                    let fetchedParcel = document.createElement('tr');
+                    fetchedParcel.innerHTML = `
                     <td>${maskEmail(parcel.senderEmail)}</td>
                     <td>${maskEmail(parcel.receiverEmail)}</td>
                     <td>${senderLocation}</td>
@@ -367,33 +384,34 @@ const getAllParcels = async () => {
                     </td>
                 `;
 
-                tableBody.appendChild(fetchedParcel);
+                    tableBody.appendChild(fetchedParcel);
                 }
             }
-            
+
             document.getElementById("incoming").addEventListener("click", async (event) => {
                 event.preventDefault();
-            
-            const receivedResponse = await fetch(receivedParcels);
-            if (!receivedResponse.ok) {
-                throw new Error(`Response status: ${receivedResponse.status}`);
-            }
-            const parcelsReceived = await receivedResponse.json();
-            if(parcelsReceived.length > 0){
-                tableBody.innerHTML = "";
 
-                for(parcel of parcelsReceived){
-                    const senderLocation = await getLocationName(parcel.senderLat, parcel.senderLng);
-                const receiverLocation = await getLocationName(parcel.receiverLat, parcel.receiverLng);
+                const receivedResponse = await fetch(receivedParcels);
+                if (!receivedResponse.ok) {
+                    throw new Error(`Response status: ${receivedResponse.status}`);
+                }
+                const parcelsReceived = await receivedResponse.json();
+                console.log("Parcels Received:", parcelsReceived);
 
-                let fetchedParcel = document.createElement('tr');
-                fetchedParcel.innerHTML = `
+                if (parcelsReceived.length > 0) {
+                    tableBody.innerHTML = "";
+
+                    for (parcel of parcelsReceived) {
+                        const senderLocation = await getLocationName(parcel.senderLat, parcel.senderLng);
+                        const receiverLocation = await getLocationName(parcel.receiverLat, parcel.receiverLng);
+
+                        let fetchedParcel = document.createElement('tr');
+                        fetchedParcel.innerHTML = `
                     <td>${maskEmail(parcel.senderEmail)}</td>
                     <td>${maskEmail(parcel.receiverEmail)}</td>
                     <td>${senderLocation}</td>
                     <td>${receiverLocation}</td>
                     <td>${parcel.dispatchedDate.split('T')[0]}</td>
-                    <td>${parcel.deliveryDate.split('T')[0]}</td>
                     <td>${parcel.deliveryStatus}</td>
                     <td>
                         <div class="action-btns">
@@ -402,11 +420,11 @@ const getAllParcels = async () => {
                     </td>
                 `;
 
-                tableBody.appendChild(fetchedParcel);
+                        tableBody.appendChild(fetchedParcel);
+                    }
                 }
-            }
-            console.log("Parcels Received:", parcelsReceived);
-        })
+                console.log("Parcels Received:", parcelsReceived);
+            })
 
         } catch (error) {
             console.error("Error fetching user parcels:", error);
@@ -473,7 +491,7 @@ const editParcel = async (parcelId) => {
 document.addEventListener("DOMContentLoaded", function () {
     document.addEventListener("click", function (event) {
         if (event.target.classList.contains("deleteParcel")) {
-            const parcelId = event.target.dataset.id; 
+            const parcelId = event.target.dataset.id;
             confirmDelete(parcelId);
         }
     });
@@ -504,7 +522,7 @@ async function deleteParcel(parcelId) {
         setTimeout(() => {
             formSuccess.style.display = "none";
         }, 3000);
-        getAllParcels(); 
+        getAllParcels();
 
     } catch (error) {
         console.error("Error:", error);
