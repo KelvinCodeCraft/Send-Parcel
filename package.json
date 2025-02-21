@@ -2,5 +2,10 @@
   "dependencies": {
     "africastalking": "^0.7.2",
     "express": "^4.21.2"
-  }
+  },
+  "scripts": {
+  "test": "cypress run",
+  "dev": "parcel sendIt-fe/auth.html sendIt-fe/index.html sendIt-fe/dashboard.html sendIt-fe/parcel-details.html",
+  "build": "parcel build sendIt-fe/auth.html sendIt-fe/index.html sendIt-fe/dashboard.html sendIt-fe/parcel-details.html"
+}
 }
