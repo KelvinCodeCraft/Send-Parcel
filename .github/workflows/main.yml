@@ -17,7 +17,7 @@ jobs:
               run: npm run build
 
             - name: List the files
-              run: ls
+              run: cd sendIt-fe && ls
               
             - name: Upload artifacts
               uses: actions/upload-artifact@v4
